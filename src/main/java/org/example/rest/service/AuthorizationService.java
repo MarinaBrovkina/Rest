@@ -4,11 +4,17 @@ import org.example.rest.advice.InvalidCredentials;
 import org.example.rest.advice.UnauthorizedUser;
 import org.example.rest.authorities.Authorities;
 import org.example.rest.repository.UserRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class AuthorizationService {
-    UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public AuthorizationService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public List<Authorities> getAuthorities(String user, String password) {
         if (isEmpty(user) || isEmpty(password)) {
@@ -29,3 +35,4 @@ public class AuthorizationService {
         return str == null || str.isEmpty();
     }
 }
+

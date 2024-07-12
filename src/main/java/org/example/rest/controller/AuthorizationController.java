@@ -12,17 +12,28 @@ import java.util.List;
 
 @RestController
 public class AuthorizationController {
-    AuthorizationService service;
+    private final AuthorizationService service;
+
+    public AuthorizationController(AuthorizationService service) {
+        this.service = service;
+    }
 
     @GetMapping("/authorize")
-    public ResponseEntity<List<Authorities>> getAuthorities(@RequestParam("user") String user, @RequestParam("password") String password) {
-        try {
-            return ResponseEntity.ok(service.getAuthorities(user, password));
-        } catch (InvalidCredentials e) {
-            return ResponseEntity.badRequest().body(List.of(Authorities.valueOf(e.getMessage())));
-        } catch (UnauthorizedUser e) {
-            System.err.println(e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(List.of(Authorities.valueOf(e.getMessage())));
-        }
+    public List<Authorities> getAuthorities(@RequestParam("user") String user,
+                                            @RequestParam("password") String password) {
+        return service.getAuthorities(user, password);
+    }
+
+    @ExceptionHandler(InvalidCredentials.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<List<Authorities>> handleInvalidCredentials(InvalidCredentials e) {
+        return ResponseEntity.badRequest().body(List.of(Authorities.valueOf(e.getMessage())));
+    }
+
+    @ExceptionHandler(UnauthorizedUser.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<List<Authorities>> handleUnauthorizedUser(UnauthorizedUser e) {
+        System.err.println(e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(List.of(Authorities.valueOf(e.getMessage())));
     }
 }
