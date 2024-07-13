@@ -1,0 +1,7 @@
+- version: '3.7'
+- services:
+- authorization-service:  имя сервиса.
+- build: ./
+- ports:
+           - 8082:8082:
+- container_name: authorization_service
